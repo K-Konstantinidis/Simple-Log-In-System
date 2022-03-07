@@ -1,3 +1,15 @@
+/*************************************************************************
+        Copyright © 2021 Konstantinidis Konstantinos
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*************************************************************************/
 #include <stdio.h>
 #include <ctype.h>
 
@@ -78,25 +90,33 @@ main(){
     system("PAUSE");
 }
 
+//A method to get the HashKey
 int HashKey(char Key[]){
     int average;
 
     average = findAverage(Key);
-	return average % 10;
+	return average % 10; //The list will have 10 positions
 }
 
+int findAverage(char s[]){
+    int length;
+    length = strlen(s);
+    return ((s[0] + s[length - 1])/2); //return = (ASCII code of 1st char + ASCII code of last char) / 2
+}
+
+//A method to create a Hash List
 void CreateHashList(HashListType *HList){
 	int index;
 
 	HList->Size=0;
 	HList->StackPtr=0;
-    index=0;
+   	index=0;
 	while (index<HMax){
 		HList->HashTable[index]=EndOfList;
 		index=index+1;
-    }
+	}
 
-    index=0;
+   	index=0;
 	while(index < VMax-1){
 		HList->List[index].Link = index + 1;
 		strcpy(HList->List[index].password, "0");
@@ -106,10 +126,12 @@ void CreateHashList(HashListType *HList){
 	HList->List[index].Link=EndOfList;
 }
 
+//A method to see if the list is full
 boolean FullHashList(HashListType HList){
 	return(HList.Size==VMax);
 }
 
+//A method to search for synonyms in the hash list
 void SearchSynonymList(HashListType HList, char KeyArg[8], int *Loc, int *Pred){
 	int Next;
 	Next=HList.SubListPtr;
@@ -127,6 +149,7 @@ void SearchSynonymList(HashListType HList, char KeyArg[8], int *Loc, int *Pred){
 	}
 }
 
+//A method to search inside the hash list
 void SearchHashList(HashListType HList,char KeyArg[],int *Loc,int *Pred){
 	int HVal;
 	HVal=HashKey(KeyArg);
@@ -140,8 +163,8 @@ void SearchHashList(HashListType HList,char KeyArg[],int *Loc,int *Pred){
 	}
 }
 
-void AddRec(HashListType *HList,ListElm InRec)
-{
+//A method to add a new record in the list
+void AddRec(HashListType *HList,ListElm InRec){
 	int Loc, Pred, New, HVal;
 
 	if(!(FullHashList(*HList))){
@@ -154,16 +177,15 @@ void AddRec(HashListType *HList,ListElm InRec)
 			HList->StackPtr=HList->List[New].Link;
 			HList->List[New]=InRec;
 			if (Pred==-1){
-			    HVal=HashKey(InRec.RecKey);
-                HList->HashTable[HVal]=New;
+			    	HVal=HashKey(InRec.RecKey);
+              			HList->HashTable[HVal]=New;
 				HList->List[New].Link=EndOfList;
 			}
 			else{
-                HList->List[New].Link=HList->List[Pred].Link;
+				HList->List[New].Link=HList->List[Pred].Link;
 				HList->List[Pred].Link=New;
 			}
 		}
-
 		else
 			printf("There is already someone with the same key \n");
 	}
@@ -171,14 +193,15 @@ void AddRec(HashListType *HList,ListElm InRec)
 		printf("Full list...");
 }
 
+//A method to create the hash list, read the file and insert the records in the list
 void BuildHashList(HashListType *Hlist){
     ListElm Item;
     FILE *fp;
     int nscan;
 
-    CreateHashList(&(*Hlist));
+    CreateHashList(&(*Hlist)); //Create the Hash list
 
-    fp = fopen("I5f6.txt", "r");
+    fp = fopen("I5f6.txt", "r"); //Read the file
     if(fp == NULL)
         printf("Problem opening file");
     else{
@@ -191,13 +214,7 @@ void BuildHashList(HashListType *Hlist){
                 break;
             }
             else
-                AddRec(Hlist, Item);
+                AddRec(Hlist, Item); //Add each recording in the list
         }
     }
-}
-
-int findAverage(char s[]){
-    int length;
-    length = strlen(s);
-    return ((s[0] + s[length - 1])/2);
 }
